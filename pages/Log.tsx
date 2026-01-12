@@ -77,6 +77,7 @@ const Log: React.FC<PageProps> = ({ user }) => {
           category="blog" 
           isAdmin={!!user}
           showTitleInput
+          showImageInput // Enable image URL input for Blog
           displayMode="blog"
           placeholder="긴 글을 작성해보세요..."
           onItemClick={(item) => setSelectedPost(item)}

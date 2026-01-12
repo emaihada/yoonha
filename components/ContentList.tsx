@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { addContentItem, deleteContentItem, subscribeToContent } from '../services/firebase';
 import { ContentItem } from '../types';
-import { Trash2, PlusCircle, ArrowRight } from 'lucide-react';
+import { Trash2, PlusCircle, ArrowRight, Image as ImageIcon } from 'lucide-react';
 import MemoItem from './MemoItem';
 
 interface ContentListProps {
@@ -10,6 +10,7 @@ interface ContentListProps {
   isAdmin: boolean;
   showTitleInput?: boolean;
   showLinkInput?: boolean;
+  showImageInput?: boolean; // New prop for image URL
   placeholder?: string;
   displayMode?: 'list' | 'card' | 'blog';
   onItemClick?: (item: ContentItem) => void;
@@ -21,6 +22,7 @@ const ContentList: React.FC<ContentListProps> = ({
   title, 
   showTitleInput, 
   showLinkInput,
+  showImageInput,
   placeholder = "내용을 입력하세요...",
   displayMode = 'list',
   onItemClick
@@ -29,6 +31,7 @@ const ContentList: React.FC<ContentListProps> = ({
   const [newItemText, setNewItemText] = useState('');
   const [newItemTitle, setNewItemTitle] = useState('');
   const [newItemLink, setNewItemLink] = useState('');
+  const [newItemImageUrl, setNewItemImageUrl] = useState('');
 
   useEffect(() => {
     const unsubscribe = subscribeToContent(category, setItems);
@@ -55,11 +58,16 @@ const ContentList: React.FC<ContentListProps> = ({
       payload.link = newItemLink;
     }
 
+    if (showImageInput) {
+      payload.imageUrl = newItemImageUrl;
+    }
+
     await addContentItem(payload);
     
     setNewItemText('');
     setNewItemTitle('');
     setNewItemLink('');
+    setNewItemImageUrl('');
   };
 
   const handleDelete = async (id: string) => {
@@ -87,21 +95,40 @@ const ContentList: React.FC<ContentListProps> = ({
               value={newItemTitle} onChange={e => setNewItemTitle(e.target.value)} 
             />
           )}
+          
           <div className="flex gap-2">
-            <input 
-              className="flex-1 p-1 focus:outline-none" 
+            <textarea 
+              className="flex-1 p-1 focus:outline-none resize-none h-20 border border-gray-100 rounded mb-1" 
               placeholder={placeholder}
               value={newItemText} onChange={e => setNewItemText(e.target.value)} 
             />
-            <button type="submit" className="text-cy-orange clickable"><PlusCircle size={20}/></button>
           </div>
-          {showLinkInput && (
-             <input 
-             className="w-full border-t mt-2 p-1 focus:outline-none text-xs text-blue-500" 
-             placeholder="URL 링크 (선택사항)" 
-             value={newItemLink} onChange={e => setNewItemLink(e.target.value)} 
-           />
-          )}
+          
+          <div className="flex justify-end mb-2">
+             <button type="submit" className="bg-cy-dark text-white text-xs px-3 py-1 rounded clickable flex items-center gap-1">
+               <PlusCircle size={14}/> 등록
+             </button>
+          </div>
+
+          <div className="space-y-1 mt-1 border-t border-gray-100 pt-1">
+             {showLinkInput && (
+                <input 
+                className="w-full p-1 focus:outline-none text-xs text-blue-500 bg-gray-50 rounded" 
+                placeholder="🔗 URL 링크 (선택사항)" 
+                value={newItemLink} onChange={e => setNewItemLink(e.target.value)} 
+              />
+             )}
+             {showImageInput && (
+                <div className="flex items-center gap-2 bg-gray-50 rounded px-1">
+                  <ImageIcon size={14} className="text-gray-400" />
+                  <input 
+                    className="w-full p-1 focus:outline-none text-xs text-gray-600 bg-transparent" 
+                    placeholder="이미지 주소 URL (선택사항 - https://...)" 
+                    value={newItemImageUrl} onChange={e => setNewItemImageUrl(e.target.value)} 
+                  />
+                </div>
+             )}
+          </div>
         </form>
       )}
 
@@ -150,9 +177,13 @@ const ContentList: React.FC<ContentListProps> = ({
               )}
               
               {displayMode === 'blog' ? (
-                <p className="whitespace-pre-wrap text-gray-700 leading-relaxed pr-6 line-clamp-3 text-sm">
-                  {item.content}
-                </p>
+                <div className="flex gap-4">
+                  {/* Thumbnail for blog list if image exists - optional enhancement, currently strictly text per request but can show small preview if desired. 
+                      User asked for image to be visible ONLY in read mode, so skipping thumbnail here. */}
+                  <p className="whitespace-pre-wrap text-gray-700 leading-relaxed pr-6 line-clamp-3 text-sm flex-1">
+                    {item.content}
+                  </p>
+                </div>
               ) : (
                 <p className="text-gray-600 pr-6">{item.content}</p>
               )}
@@ -170,7 +201,10 @@ const ContentList: React.FC<ContentListProps> = ({
               )}
               
               {displayMode === 'blog' && (
-                <div className="text-xs text-gray-400 mt-2">{new Date(item.createdAt).toLocaleDateString()}</div>
+                <div className="text-xs text-gray-400 mt-2 flex gap-2 items-center">
+                   <span>{new Date(item.createdAt).toLocaleDateString()}</span>
+                   {item.imageUrl && <span className="text-[10px] bg-gray-100 text-gray-500 px-1 rounded">사진 있음</span>}
+                </div>
               )}
             </div>
           ))}

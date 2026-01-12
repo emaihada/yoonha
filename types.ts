@@ -19,6 +19,7 @@ export interface ContentItem {
   title?: string;
   content: string;
   link?: string; // For youtube/music links
+  imageUrl?: string; // For blog post images
   createdAt: number;
 }
 

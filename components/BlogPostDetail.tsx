@@ -57,6 +57,20 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({ post, isAdmin, onBack }
 
       {/* Post Content */}
       <div className="mb-10 pl-2 min-h-[150px]">
+        {/* Render Image if exists */}
+        {post.imageUrl && (
+          <div className="mb-6 rounded-lg overflow-hidden border border-gray-100 shadow-sm">
+            <img 
+              src={post.imageUrl} 
+              alt="Post Image" 
+              className="w-full h-auto"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
+            />
+          </div>
+        )}
+
         <div className="whitespace-pre-wrap leading-relaxed text-gray-800 text-base font-hand">
           {post.content}
         </div>
