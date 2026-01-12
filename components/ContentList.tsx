@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { addContentItem, deleteContentItem, subscribeToContent } from '../services/firebase';
 import { ContentItem } from '../types';
 import { Trash2, PlusCircle, ArrowRight } from 'lucide-react';
+import MemoItem from './MemoItem';
 
 interface ContentListProps {
-  category: string; // e.g., 'manual_do', 'blog'
+  category: string; // e.g., 'manual_do', 'blog', 'memo'
   title?: string;
   isAdmin: boolean;
   showTitleInput?: boolean;
@@ -61,11 +62,16 @@ const ContentList: React.FC<ContentListProps> = ({
     setNewItemLink('');
   };
 
-  const handleDelete = async (e: React.MouseEvent, id: string) => {
-    e.stopPropagation(); // Stop event bubbling to parent containers
+  const handleDelete = async (id: string) => {
     if (window.confirm('정말 삭제하시겠습니까?')) {
       await deleteContentItem(id);
     }
+  };
+
+  // Wrapper for list item delete button (for non-Memo items)
+  const handleDeleteClick = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    handleDelete(id);
   };
 
   return (
@@ -99,62 +105,78 @@ const ContentList: React.FC<ContentListProps> = ({
         </form>
       )}
 
-      <div className={`space-y-2 ${displayMode === 'card' ? 'grid grid-cols-1 md:grid-cols-2 gap-4 space-y-0' : ''}`}>
-        {items.map(item => (
-          <div 
-            key={item.id} 
-            onClick={() => onItemClick && onItemClick(item)}
-            className={`
-            group relative p-3 rounded transition-all duration-200
-            ${displayMode === 'blog' 
-              ? 'border-b border-gray-200 pb-4 mb-4 hover:bg-gray-50 cursor-pointer' 
-              : 'bg-white border border-gray-100 shadow-sm'}
-          `}>
-            {isAdmin && (
-              <button 
-                type="button" 
-                onClick={(e) => handleDelete(e, item.id)}
-                className="absolute top-2 right-2 text-gray-300 hover:text-red-500 clickable p-1 z-10"
-                title="삭제"
-              >
-                <Trash2 size={16} />
-              </button>
-            )}
-            
-            {item.title && (
-              <div className="font-bold text-base mb-1 flex items-center gap-2 group-hover:text-cy-orange transition-colors">
-                {item.title}
-                {displayMode === 'blog' && <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400"/>}
-              </div>
-            )}
-            
-            {displayMode === 'blog' ? (
-              <p className="whitespace-pre-wrap text-gray-700 leading-relaxed pr-6 line-clamp-3 text-sm">
-                {item.content}
-              </p>
-            ) : (
-              <p className="text-gray-600 pr-6">{item.content}</p>
-            )}
+      {/* Special Rendering for Memo Category */}
+      {category === 'memo' ? (
+        <div className="space-y-2">
+          {items.map(item => (
+            <MemoItem 
+              key={item.id} 
+              item={item} 
+              isAdmin={isAdmin} 
+              onDelete={handleDelete} 
+            />
+          ))}
+          {items.length === 0 && <p className="text-gray-400 italic text-sm text-center py-4">아직 작성된 짧은 글이 없습니다.</p>}
+        </div>
+      ) : (
+        /* Standard Rendering for other categories (Blog, Manual, etc.) */
+        <div className={`space-y-2 ${displayMode === 'card' ? 'grid grid-cols-1 md:grid-cols-2 gap-4 space-y-0' : ''}`}>
+          {items.map(item => (
+            <div 
+              key={item.id} 
+              onClick={() => onItemClick && onItemClick(item)}
+              className={`
+              group relative p-3 rounded transition-all duration-200
+              ${displayMode === 'blog' 
+                ? 'border-b border-gray-200 pb-4 mb-4 hover:bg-gray-50 cursor-pointer' 
+                : 'bg-white border border-gray-100 shadow-sm'}
+            `}>
+              {isAdmin && (
+                <button 
+                  type="button" 
+                  onClick={(e) => handleDeleteClick(e, item.id)}
+                  className="absolute top-2 right-2 text-gray-300 hover:text-red-500 clickable p-1 z-10"
+                  title="삭제"
+                >
+                  <Trash2 size={16} />
+                </button>
+              )}
+              
+              {item.title && (
+                <div className="font-bold text-base mb-1 flex items-center gap-2 group-hover:text-cy-orange transition-colors">
+                  {item.title}
+                  {displayMode === 'blog' && <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400"/>}
+                </div>
+              )}
+              
+              {displayMode === 'blog' ? (
+                <p className="whitespace-pre-wrap text-gray-700 leading-relaxed pr-6 line-clamp-3 text-sm">
+                  {item.content}
+                </p>
+              ) : (
+                <p className="text-gray-600 pr-6">{item.content}</p>
+              )}
 
-            {item.link && (
-               <a 
-                href={item.link} 
-                target="_blank" 
-                rel="noreferrer" 
-                className="text-xs text-blue-400 hover:underline mt-1 block w-fit"
-                onClick={(e) => e.stopPropagation()}
-               >
-                 보러가기 / 듣기 &rarr;
-               </a>
-            )}
-            
-            {displayMode === 'blog' && (
-              <div className="text-xs text-gray-400 mt-2">{new Date(item.createdAt).toLocaleDateString()}</div>
-            )}
-          </div>
-        ))}
-        {items.length === 0 && <p className="text-gray-300 italic text-sm">아직 내용이 없습니다...</p>}
-      </div>
+              {item.link && (
+                 <a 
+                  href={item.link} 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="text-xs text-blue-400 hover:underline mt-1 block w-fit"
+                  onClick={(e) => e.stopPropagation()}
+                 >
+                   보러가기 / 듣기 &rarr;
+                 </a>
+              )}
+              
+              {displayMode === 'blog' && (
+                <div className="text-xs text-gray-400 mt-2">{new Date(item.createdAt).toLocaleDateString()}</div>
+              )}
+            </div>
+          ))}
+          {items.length === 0 && <p className="text-gray-300 italic text-sm">아직 내용이 없습니다...</p>}
+        </div>
+      )}
     </div>
   );
 };

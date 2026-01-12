@@ -29,7 +29,16 @@ const Log: React.FC<PageProps> = ({ user }) => {
         </div>
       );
     }
-    return "기록장";
+    
+    // Default title with warning text
+    return (
+      <div className="flex flex-wrap items-end gap-2">
+        <span>기록장</span>
+        <span className="text-[11px] md:text-xs font-normal text-gray-400 -mb-0.5 whitespace-nowrap">
+          ※댓글 삭제는 최윤하에게 요청하지 않으면 불가능※
+        </span>
+      </div>
+    );
   };
 
   // If a post is selected, show the detail view
@@ -46,7 +55,7 @@ const Log: React.FC<PageProps> = ({ user }) => {
   }
 
   return (
-    <Layout title="기록장">
+    <Layout title={getTitle()}>
       {/* Internal Tabs */}
       <div className="flex gap-4 mb-6 border-b border-gray-200">
         <button 
@@ -73,13 +82,11 @@ const Log: React.FC<PageProps> = ({ user }) => {
           onItemClick={(item) => setSelectedPost(item)}
         />
       ) : (
-        <div className="bg-yellow-50 p-6 rounded shadow-inner min-h-[300px]">
-           <ContentList 
-            category="memo" 
-            isAdmin={!!user}
-            placeholder="짧은 생각..."
-          />
-        </div>
+        <ContentList 
+          category="memo" 
+          isAdmin={!!user}
+          placeholder="짧은 생각을 남겨보세요..."
+        />
       )}
     </Layout>
   );
