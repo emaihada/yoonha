@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>윤하의 미니홈피</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri/dist/galmuri.css">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              'pixel': ['"Galmuri9"', 'monospace'],
+              'hand': ['"Galmuri9"', 'monospace'], /* Replaced Gaegu with Galmuri9 for unified retro look */
+            },
+            colors: {
+              'cy-blue': '#b2dffc',
+              'cy-gray': '#eeeeee',
+              'cy-dark': '#333333',
+              'cy-orange': '#ff8800',
+            },
+            cursor: {
+              'pixel': 'url(https://cur.cursors-4u.net/cursors/cur-2/cur116.cur), auto',
+              'pointer-pixel': 'url(https://cur.cursors-4u.net/cursors/cur-2/cur117.cur), pointer',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        cursor: url(https://cur.cursors-4u.net/cursors/cur-2/cur116.cur), auto;
+        font-family: 'Galmuri9', monospace;
+      }
+      a, button, .clickable {
+        cursor: url(https://cur.cursors-4u.net/cursors/cur-2/cur117.cur), pointer;
+      }
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1; 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #ccc; 
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #aaa; 
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "firebase/": "https://esm.sh/firebase@^12.7.0/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "react-router-dom": "https://esm.sh/react-router-dom@^7.12.0"
+  }
+}
+</script>
+</head>
+  <body class="bg-gray-100 font-hand text-cy-dark">
+    <div id="root"></div>
+  </body>
+</html>
