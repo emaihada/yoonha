@@ -35,7 +35,7 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({ post, isAdmin, onBack }
   };
 
   return (
-    <div className="flex flex-col animate-fade-in min-h-full relative">
+    <div className="flex flex-col animate-fade-in h-full">
       {/* Title & Back Button Section */}
       <div className="mb-6 border-b border-gray-100 pb-4">
         <div className="flex items-center gap-3 mb-2">
@@ -96,8 +96,8 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({ post, isAdmin, onBack }
           )}
         </div>
 
-        {/* Sticky Comment Form Wrapper */}
-        <div className="sticky bottom-[-1rem] md:bottom-[-1.5rem] -mx-4 md:-mx-6 bg-white/95 backdrop-blur p-4 md:p-6 border-t border-gray-100 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-20 mt-4">
+        {/* Comment Form - Sticky Bottom */}
+        <div className="sticky bottom-0 bg-white pt-2 pb-0 z-10">
           <form onSubmit={handleSubmit} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
             <div className="flex flex-col gap-2">
               <input
