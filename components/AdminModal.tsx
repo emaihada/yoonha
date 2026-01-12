@@ -116,7 +116,7 @@ const AdminModal: React.FC<AdminModalProps> = ({ user }) => {
                 </button>
 
                 <div className="text-[10px] text-gray-400 text-center">
-                  * Firebase Console에서 Authentication > Email/Password가 활성화되어 있어야 하며, 해당 이메일의 사용자가 등록되어 있어야 합니다.
+                  * Firebase Console에서 Authentication &gt; Email/Password가 활성화되어 있어야 하며, 해당 이메일의 사용자가 등록되어 있어야 합니다.
                 </div>
               </form>
             )}
