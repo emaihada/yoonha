@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { addContentItem, deleteContentItem, subscribeToContent } from '../services/firebase';
+import { addContentItem, deleteContentItem, subscribeToContent, toggleContentPin } from '../services/firebase';
 import { ContentItem } from '../types';
-import { Trash2, PlusCircle, ArrowRight, Image as ImageIcon } from 'lucide-react';
+import { Trash2, PlusCircle, ArrowRight, Image as ImageIcon, Pin } from 'lucide-react';
 import MemoItem from './MemoItem';
 import ConfirmModal from './ConfirmModal';
 
@@ -52,7 +52,8 @@ const ContentList: React.FC<ContentListProps> = ({
       category,
       content: newItemText,
       createdAt: Date.now(),
-      commentCount: 0 // Initialize comment count
+      commentCount: 0, // Initialize comment count
+      isPinned: false
     };
 
     if (showTitleInput) {
@@ -86,6 +87,11 @@ const ContentList: React.FC<ContentListProps> = ({
   const handleDeleteClick = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
     setDeleteId(id);
+  };
+
+  const handlePinClick = async (e: React.MouseEvent, id: string, currentStatus: boolean) => {
+    e.stopPropagation();
+    await toggleContentPin(id, category, currentStatus);
   };
 
   return (
@@ -172,22 +178,41 @@ const ContentList: React.FC<ContentListProps> = ({
               ${displayMode === 'blog' 
                 ? 'border-b border-gray-200 pb-2 mb-2 hover:bg-gray-50 cursor-pointer flex items-center justify-between' 
                 : 'bg-white border border-gray-100 shadow-sm'}
+              ${item.isPinned ? 'bg-orange-50/50 border-cy-orange/30' : ''}
             `}>
+              {/* Admin Actions: Pin & Delete */}
               {isAdmin && (
-                <button 
-                  type="button" 
-                  onClick={(e) => handleDeleteClick(e, item.id)}
-                  className="absolute top-2 right-2 text-gray-300 hover:text-red-500 clickable p-1 z-10"
-                  title="삭제"
-                >
-                  <Trash2 size={16} />
-                </button>
+                <div className="absolute top-2 right-2 flex gap-1 z-10">
+                   {/* Pin Button for Blog */}
+                   {category === 'blog' && (
+                     <button
+                       type="button"
+                       onClick={(e) => handlePinClick(e, item.id, !!item.isPinned)}
+                       className={`p-1 clickable ${item.isPinned ? 'text-red-500' : 'text-gray-200 hover:text-red-300'}`}
+                       title={item.isPinned ? "고정 해제" : "상단 고정"}
+                     >
+                       <Pin size={16} fill={item.isPinned ? "currentColor" : "none"} />
+                     </button>
+                   )}
+                   <button 
+                    type="button" 
+                    onClick={(e) => handleDeleteClick(e, item.id)}
+                    className="text-gray-300 hover:text-red-500 clickable p-1"
+                    title="삭제"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
               )}
               
               {displayMode === 'blog' ? (
                 // Blog List View (Title Only)
                 <>
-                  <div className="flex items-center gap-1 overflow-hidden flex-1 min-w-0 pr-2">
+                  <div className="flex items-center gap-1 overflow-hidden flex-1 min-w-0 pr-12">
+                     {/* Pinned Badge for Everyone */}
+                     {item.isPinned && (
+                        <Pin size={14} className="text-red-500 fill-red-500 shrink-0 mr-1" />
+                     )}
                      <span className="font-bold text-base group-hover:text-cy-orange transition-colors truncate pl-1">
                        {item.title || "무제"}
                      </span>
@@ -210,6 +235,7 @@ const ContentList: React.FC<ContentListProps> = ({
                 <>
                   {item.title && (
                     <div className="font-bold text-base mb-1 flex items-center gap-2 group-hover:text-cy-orange transition-colors">
+                      {item.isPinned && <Pin size={14} className="text-red-500 fill-red-500" />}
                       {item.title}
                     </div>
                   )}

@@ -5,7 +5,7 @@ interface LayoutProps {
   title?: React.ReactNode;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, title = "윤하의 미니홈피" }) => {
+const Layout: React.FC<LayoutProps> = ({ children, title = "최윤하의 홈피" }) => {
   return (
     <div className="min-h-screen p-2 sm:p-4 md:p-8 flex justify-center items-start">
       <div className="w-full max-w-4xl bg-cy-blue rounded-xl p-2 sm:p-6 shadow-xl relative ring-1 ring-black/10">

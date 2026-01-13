@@ -22,6 +22,7 @@ export interface ContentItem {
   imageUrl?: string; // For blog post images
   createdAt: number;
   commentCount?: number;
+  isPinned?: boolean; // New field for top-fixed posts
 }
 
 export type SectionType = 'home' | 'about' | 'taste' | 'log';

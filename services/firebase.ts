@@ -12,7 +12,8 @@ import {
   updateDoc,
   where,
   increment,
-  writeBatch
+  writeBatch,
+  getDocs
 } from 'firebase/firestore';
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, User } from 'firebase/auth';
 // 타입 정의 파일이 있다면 이 줄을 유지하세요. 만약 에러나면 이 줄만 지우셔도 됩니다.
@@ -84,12 +85,55 @@ export const deleteContentItem = async (id: string) => {
   await deleteDoc(doc(db, 'contents', id));
 };
 
+// 핀(상단고정) 토글 기능 - 하나만 고정되도록 처리
+export const toggleContentPin = async (id: string, category: string, currentStatus: boolean) => {
+  const batch = writeBatch(db);
+
+  // 1. 이미 핀이 되어있던 거라면 -> 핀 해제만 수행
+  if (currentStatus) {
+    const docRef = doc(db, 'contents', id);
+    batch.update(docRef, { isPinned: false });
+  } 
+  // 2. 핀이 안 되어있던 거라면 -> 다른 모든 핀 해제 후 이것만 핀 설정
+  else {
+    // 해당 카테고리에서 이미 핀 된 항목들 찾기
+    const q = query(
+      collection(db, 'contents'), 
+      where('category', '==', category),
+      where('isPinned', '==', true)
+    );
+    const snapshot = await getDocs(q);
+    
+    // 기존 핀들 모두 해제
+    snapshot.forEach((doc) => {
+      batch.update(doc.ref, { isPinned: false });
+    });
+
+    // 현재 선택한 항목 핀 설정
+    const docRef = doc(db, 'contents', id);
+    batch.update(docRef, { isPinned: true });
+  }
+
+  await batch.commit();
+};
+
 export const subscribeToContent = (category: string, callback: (items: ContentItem[]) => void) => {
   const q = query(collection(db, 'contents'), orderBy('createdAt', 'desc'));
   return onSnapshot(q, (snapshot) => {
-    const items = snapshot.docs
+    let items = snapshot.docs
       .map(doc => ({ id: doc.id, ...doc.data() } as ContentItem))
       .filter(item => item.category === category);
+    
+    // 클라이언트 측 정렬: 핀 된 것을 최상단으로
+    items.sort((a, b) => {
+      // 둘 다 핀 상태가 같으면 최신순
+      if (!!a.isPinned === !!b.isPinned) {
+        return b.createdAt - a.createdAt;
+      }
+      // 핀 된게(true) 앞으로(-1)
+      return a.isPinned ? -1 : 1;
+    });
+
     callback(items);
   });
 };
