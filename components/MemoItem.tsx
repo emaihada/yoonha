@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ContentItem, Comment } from '../types';
 import { subscribeToComments, addComment, deleteComment } from '../services/firebase';
-import { MessageCircle, Trash2, Send, ChevronDown, ChevronUp } from 'lucide-react';
+import { MessageCircle, Trash2, Send, ChevronDown, ChevronUp, Smile } from 'lucide-react';
 
 interface MemoItemProps {
   item: ContentItem;
@@ -121,27 +121,37 @@ const MemoItem: React.FC<MemoItemProps> = ({ item, isAdmin, onDelete }) => {
           </div>
 
           {/* Comment Input */}
-          <form onSubmit={handleSubmit} onClick={(e) => e.stopPropagation()} className="flex flex-col gap-2">
-            <div className="flex gap-2">
+          <form onSubmit={handleSubmit} onClick={(e) => e.stopPropagation()} className="flex flex-col gap-2 w-full">
+            
+            <div className="flex items-center gap-2">
               <input
                 type="text"
-                placeholder="닉네임"
+                placeholder="이름"
                 className="w-24 text-xs p-2 border border-gray-300 rounded focus:outline-none focus:border-cy-orange"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
               />
+              <div 
+                className="bg-orange-100 p-1.5 rounded-full text-cy-orange clickable cursor-pointer hover:bg-orange-200 transition-colors"
+                onClick={() => alert('실명으로 해주면 감사하겠어')}
+              >
+                <Smile size={16} />
+              </div>
+            </div>
+
+            <div className="flex gap-2 w-full">
               <input
                 type="text"
                 placeholder="댓글 달기..."
-                className="flex-1 text-xs p-2 border border-gray-300 rounded focus:outline-none focus:border-cy-orange"
+                className="flex-1 min-w-0 text-xs p-2 border border-gray-300 rounded focus:outline-none focus:border-cy-orange"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 required
               />
               <button 
                 type="submit"
-                className="bg-cy-dark text-white rounded px-3 hover:bg-gray-700 transition-colors clickable flex items-center justify-center"
+                className="bg-cy-dark text-white rounded px-3 hover:bg-gray-700 transition-colors clickable flex items-center justify-center shrink-0"
               >
                 <Send size={14} />
               </button>

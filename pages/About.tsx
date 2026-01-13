@@ -8,7 +8,7 @@ interface PageProps {
 
 const About: React.FC<PageProps> = ({ user }) => {
   return (
-    <Layout title="프로필 & 취향">
+    <Layout title="프로필">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
         
         {/* Left Column: User Manual */}
@@ -26,7 +26,7 @@ const About: React.FC<PageProps> = ({ user }) => {
               <ul className="space-y-2 text-sm text-gray-700 pl-2">
                 <li className="flex items-center gap-2">
                   <span className="text-cy-orange text-[10px] leading-none pt-0.5">❤</span> 
-                  <span>골때리게 웃긴 것</span>
+                  <span>아주 웃긴 것</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-cy-orange text-[10px] leading-none pt-0.5">❤</span> 
@@ -42,7 +42,7 @@ const About: React.FC<PageProps> = ({ user }) => {
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-cy-orange text-[10px] leading-none pt-0.5">❤</span> 
-                  <span>립미얼론 (날 혼자 둬라는 뜻)</span>
+                  <span>혼자만의 시간</span>
                 </li>
               </ul>
             </div>
@@ -82,13 +82,14 @@ const About: React.FC<PageProps> = ({ user }) => {
         <div className="space-y-6 flex flex-col">
            {/* Frequent Words */}
            <div className="bg-white border border-gray-200 p-5 rounded-xl shadow-sm">
-              <h3 className="text-lg font-bold font-pixel mb-4 text-cy-dark">💬 자주 쓰는 말</h3>
+              <h3 className="text-lg font-bold font-pixel mb-4 text-cy-dark">💬 좋아하는 단어</h3>
               <div className="flex flex-wrap gap-2">
-                <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-lg text-sm border border-gray-200 shadow-sm">앙기모</span>
-                <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-lg text-sm border border-gray-200 shadow-sm">~다맨이야</span>
-                <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-lg text-sm border border-gray-200 shadow-sm">~가 되</span>
-                <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-lg text-sm border border-gray-200 shadow-sm">~삼</span>
-                <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-lg text-sm border border-gray-200 shadow-sm">럴수있</span>
+                <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-lg text-sm border border-gray-200 shadow-sm">왕</span>
+                <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-lg text-sm border border-gray-200 shadow-sm">고구마</span>
+                <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-lg text-sm border border-gray-200 shadow-sm">키보드</span>
+                <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-lg text-sm border border-gray-200 shadow-sm">개</span>
+                <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-lg text-sm border border-gray-200 shadow-sm">병따개</span>
+                <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-lg text-sm border border-gray-200 shadow-sm">퀸</span>
               </div>
            </div>
 
@@ -108,7 +109,7 @@ const About: React.FC<PageProps> = ({ user }) => {
                  </li>
                  <li className="flex items-center gap-3 bg-white p-2 rounded shadow-sm border border-yellow-50">
                    <span className="text-xl">🍗</span> 
-                   <span>먹어도 살찌지 않는 치킨 무한 생성기</span>
+                   <span>먹어도 살찌지 않는 맛난 음식</span>
                  </li>
                  <li className="flex items-center gap-3 bg-white p-2 rounded shadow-sm border border-yellow-50">
                    <span className="text-xl">🤴</span> 

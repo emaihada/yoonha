@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { addGuestbookEntry, deleteGuestbookEntry, subscribeToGuestbook } from '../services/firebase';
 import { GuestbookEntry } from '../types';
-import { Send, Trash2 } from 'lucide-react';
+import { Send, Trash2, Smile } from 'lucide-react';
 
 interface GuestbookProps {
   isAdmin: boolean;
@@ -47,26 +47,36 @@ const Guestbook: React.FC<GuestbookProps> = ({ isAdmin }) => {
       {/* Input Form */}
       <form onSubmit={handleSubmit} className="bg-gray-50 p-3 rounded-lg border border-gray-200 mb-6">
         <div className="flex flex-col gap-2">
-          <input
-            type="text"
-            placeholder="닉네임 (10자 이내)"
-            className="p-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-cy-orange"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            maxLength={10}
-            required
-          />
+          
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              placeholder="이름"
+              className="w-24 p-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-cy-orange"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              maxLength={10}
+              required
+            />
+            <div 
+              className="bg-orange-100 p-1.5 rounded-full text-cy-orange clickable cursor-pointer hover:bg-orange-200 transition-colors"
+              onClick={() => alert('실명으로 해주면 감사하겠어')}
+            >
+              <Smile size={16} />
+            </div>
+          </div>
+
           <div className="flex gap-2">
             <textarea
               placeholder="내용을 적어주세요..."
-              className="flex-1 p-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-cy-orange resize-none h-10 md:h-12"
+              className="flex-1 p-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-cy-orange resize-none h-10 md:h-12 min-w-0"
               value={content}
               onChange={(e) => setContent(e.target.value)}
               required
             />
             <button 
               type="submit"
-              className="bg-cy-dark text-white rounded px-4 hover:bg-gray-700 transition-colors clickable"
+              className="bg-cy-dark text-white rounded px-4 hover:bg-gray-700 transition-colors clickable flex items-center justify-center shrink-0"
             >
               <Send size={16} />
             </button>

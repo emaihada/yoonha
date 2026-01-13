@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ContentItem, Comment } from '../types';
 import { addComment, deleteComment, subscribeToComments } from '../services/firebase';
-import { ArrowLeft, Send, Trash2, MessageCircle } from 'lucide-react';
+import { ArrowLeft, Send, Trash2, MessageCircle, Smile } from 'lucide-react';
 
 interface BlogPostDetailProps {
   post: ContentItem;
@@ -114,18 +114,27 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({ post, isAdmin, onBack }
         <div className="sticky bottom-0 bg-white pt-2 pb-0 z-10">
           <form onSubmit={handleSubmit} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
             <div className="flex flex-col gap-2">
-              <input
-                type="text"
-                placeholder="닉네임"
-                className="w-full text-xs p-2 border border-gray-200 rounded focus:outline-none focus:border-cy-orange bg-white"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-              <div className="flex gap-2">
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="이름"
+                  className="w-24 text-xs p-2 border border-gray-200 rounded focus:outline-none focus:border-cy-orange bg-white"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+                <div 
+                  className="bg-orange-100 p-1.5 rounded-full text-cy-orange clickable cursor-pointer hover:bg-orange-200 transition-colors"
+                  onClick={() => alert('실명으로 해주면 감사하겠어')}
+                >
+                  <Smile size={16} />
+                </div>
+              </div>
+
+              <div className="flex gap-2 w-full">
                 <textarea
                   placeholder="댓글을 입력하세요..."
-                  className="flex-1 text-xs p-2 focus:outline-none resize-none h-10 border border-gray-200 rounded focus:border-cy-orange bg-white"
+                  className="flex-1 min-w-0 text-xs p-2 focus:outline-none resize-none h-10 border border-gray-200 rounded focus:border-cy-orange bg-white"
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   required
