@@ -10,7 +10,9 @@ import {
   doc,
   serverTimestamp,
   updateDoc,
-  where
+  where,
+  increment,
+  writeBatch
 } from 'firebase/firestore';
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, User } from 'firebase/auth';
 // 타입 정의 파일이 있다면 이 줄을 유지하세요. 만약 에러나면 이 줄만 지우셔도 됩니다.
@@ -94,16 +96,35 @@ export const subscribeToContent = (category: string, callback: (items: ContentIt
 
 // --- 댓글(Comments) 관련 기능 ---
 export const addComment = async (postId: string, name: string, content: string) => {
-  await addDoc(collection(db, 'comments'), {
+  const batch = writeBatch(db);
+  const commentRef = doc(collection(db, 'comments'));
+  
+  // 1. 댓글 추가
+  batch.set(commentRef, {
     postId,
     name,
     content,
     createdAt: Date.now()
   });
+
+  // 2. 게시글의 댓글 수 증가
+  const postRef = doc(db, 'contents', postId);
+  batch.update(postRef, { commentCount: increment(1) });
+
+  await batch.commit();
 };
 
-export const deleteComment = async (id: string) => {
-  await deleteDoc(doc(db, 'comments', id));
+export const deleteComment = async (id: string, postId: string) => {
+  const batch = writeBatch(db);
+  
+  // 1. 댓글 삭제
+  batch.delete(doc(db, 'comments', id));
+
+  // 2. 게시글의 댓글 수 감소
+  const postRef = doc(db, 'contents', postId);
+  batch.update(postRef, { commentCount: increment(-1) });
+
+  await batch.commit();
 };
 
 export const subscribeToComments = (postId: string, callback: (comments: Comment[]) => void) => {

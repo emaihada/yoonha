@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ContentItem, Comment } from '../types';
 import { addComment, deleteComment, subscribeToComments } from '../services/firebase';
 import { ArrowLeft, Send, Trash2, MessageCircle, Smile } from 'lucide-react';
+import ConfirmModal from './ConfirmModal';
 
 interface BlogPostDetailProps {
   post: ContentItem;
@@ -13,6 +14,8 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({ post, isAdmin, onBack }
   const [comments, setComments] = useState<Comment[]>([]);
   const [name, setName] = useState('');
   const [content, setContent] = useState('');
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [deleteCommentId, setDeleteCommentId] = useState<string | null>(null);
 
   useEffect(() => {
     const unsubscribe = subscribeToComments(post.id, setComments);
@@ -28,14 +31,31 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({ post, isAdmin, onBack }
     setContent('');
   };
 
-  const handleDeleteComment = async (id: string) => {
-    if (window.confirm('댓글을 삭제하시겠습니까?')) {
-      await deleteComment(id);
+  const confirmDeleteComment = async () => {
+    if (deleteCommentId) {
+      await deleteComment(deleteCommentId, post.id);
+      setDeleteCommentId(null);
     }
+  };
+
+  const handleSmileClick = () => {
+    setShowTooltip(true);
+    setTimeout(() => {
+      setShowTooltip(false);
+    }, 2000);
   };
 
   return (
     <div className="flex flex-col animate-fade-in h-full">
+      <ConfirmModal 
+        isOpen={!!deleteCommentId}
+        title="댓글 삭제"
+        message="정말 이 댓글을 삭제하시겠습니까?"
+        onConfirm={confirmDeleteComment}
+        onCancel={() => setDeleteCommentId(null)}
+        confirmText="삭제"
+      />
+
       {/* Title & Back Button Section */}
       <div className="mb-6 border-b border-gray-100 pb-4">
         <div className="flex items-center gap-3 mb-2">
@@ -92,7 +112,7 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({ post, isAdmin, onBack }
               <div key={comment.id} className="bg-gray-50/50 border border-gray-100 rounded p-3 text-sm relative group hover:bg-gray-50 transition-colors">
                 {isAdmin && (
                   <button 
-                    onClick={() => handleDeleteComment(comment.id)}
+                    onClick={() => setDeleteCommentId(comment.id)}
                     className="absolute top-2 right-2 text-gray-300 hover:text-red-500 clickable"
                   >
                     <Trash2 size={12} />
@@ -123,11 +143,20 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({ post, isAdmin, onBack }
                   onChange={(e) => setName(e.target.value)}
                   required
                 />
-                <div 
-                  className="bg-orange-100 p-1.5 rounded-full text-cy-orange clickable cursor-pointer hover:bg-orange-200 transition-colors"
-                  onClick={() => alert('실명으로 해주면 감사하겠어')}
-                >
-                  <Smile size={16} />
+                <div className="relative">
+                  <div 
+                    className="bg-orange-100 p-1.5 rounded-full text-cy-orange clickable cursor-pointer hover:bg-orange-200 transition-colors"
+                    onClick={handleSmileClick}
+                  >
+                    <Smile size={16} />
+                  </div>
+                  {/* Speech Bubble Tooltip */}
+                  {showTooltip && (
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[200px] bg-cy-dark text-white text-[10px] px-2 py-1 rounded shadow-lg animate-fade-in z-20 font-pixel">
+                      실명으로 해주면 감사하겠어
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-cy-dark"></div>
+                    </div>
+                  )}
                 </div>
               </div>
 

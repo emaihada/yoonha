@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { addGuestbookEntry, deleteGuestbookEntry, subscribeToGuestbook } from '../services/firebase';
 import { GuestbookEntry } from '../types';
 import { Send, Trash2, Smile } from 'lucide-react';
+import ConfirmModal from './ConfirmModal';
 
 interface GuestbookProps {
   isAdmin: boolean;
@@ -11,6 +12,8 @@ const Guestbook: React.FC<GuestbookProps> = ({ isAdmin }) => {
   const [entries, setEntries] = useState<GuestbookEntry[]>([]);
   const [name, setName] = useState('');
   const [content, setContent] = useState('');
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
     const unsubscribe = subscribeToGuestbook((data) => {
@@ -28,15 +31,36 @@ const Guestbook: React.FC<GuestbookProps> = ({ isAdmin }) => {
     setContent('');
   };
 
-  const handleDelete = async (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
-    if (window.confirm('정말 삭제하시겠습니까?')) {
-      await deleteGuestbookEntry(id);
+  const confirmDelete = async () => {
+    if (deleteId) {
+      await deleteGuestbookEntry(deleteId);
+      setDeleteId(null);
     }
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    setDeleteId(id);
+  };
+
+  const handleSmileClick = () => {
+    setShowTooltip(true);
+    setTimeout(() => {
+      setShowTooltip(false);
+    }, 2000);
   };
 
   return (
     <div className="mt-8">
+      <ConfirmModal 
+        isOpen={!!deleteId}
+        title="방명록 삭제"
+        message="정말 이 방명록을 삭제하시겠습니까?"
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteId(null)}
+        confirmText="삭제"
+      />
+
       <h3 className="text-xl font-bold font-pixel text-cy-dark mb-4 border-b border-dashed border-gray-300 pb-2 flex flex-wrap items-end gap-2">
         방명록
         <span className="text-[10px] md:text-xs font-normal text-gray-400">
@@ -58,11 +82,20 @@ const Guestbook: React.FC<GuestbookProps> = ({ isAdmin }) => {
               maxLength={10}
               required
             />
-            <div 
-              className="bg-orange-100 p-1.5 rounded-full text-cy-orange clickable cursor-pointer hover:bg-orange-200 transition-colors"
-              onClick={() => alert('실명으로 해주면 감사하겠어')}
-            >
-              <Smile size={16} />
+            <div className="relative">
+              <div 
+                className="bg-orange-100 p-1.5 rounded-full text-cy-orange clickable cursor-pointer hover:bg-orange-200 transition-colors"
+                onClick={handleSmileClick}
+              >
+                <Smile size={16} />
+              </div>
+              {/* Speech Bubble Tooltip */}
+              {showTooltip && (
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[200px] bg-cy-dark text-white text-[10px] px-2 py-1 rounded shadow-lg animate-fade-in z-20 font-pixel">
+                  실명으로 해주면 감사하겠어
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-cy-dark"></div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -94,7 +127,7 @@ const Guestbook: React.FC<GuestbookProps> = ({ isAdmin }) => {
               {isAdmin && (
                 <button 
                   type="button"
-                  onClick={(e) => handleDelete(e, entry.id)}
+                  onClick={(e) => handleDeleteClick(e, entry.id)}
                   className="absolute top-2 right-2 text-gray-300 hover:text-red-500 clickable p-1 z-10"
                   title="삭제"
                 >

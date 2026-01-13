@@ -21,6 +21,7 @@ export interface ContentItem {
   link?: string; // For youtube/music links
   imageUrl?: string; // For blog post images
   createdAt: number;
+  commentCount?: number;
 }
 
 export type SectionType = 'home' | 'about' | 'taste' | 'log';

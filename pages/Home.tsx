@@ -53,11 +53,11 @@ const Home: React.FC<PageProps> = ({ user }) => {
                   {profile.instagram}
                 </a>
               </div>
-              <div className="flex items-center justify-center gap-2 text-green-600 hover:text-green-500 transition-colors">
+              <div className="flex items-center justify-center gap-2 text-green-600">
                 <Mail size={18} /> 
-                <a href={`mailto:${profile.email}`} className="font-pixel text-sm hover:underline">
+                <span className="font-pixel text-sm">
                   {profile.email}
-                </a>
+                </span>
               </div>
             </div>
           </div>

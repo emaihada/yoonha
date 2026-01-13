@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ContentItem, Comment } from '../types';
 import { subscribeToComments, addComment, deleteComment } from '../services/firebase';
 import { MessageCircle, Trash2, Send, ChevronDown, ChevronUp, Smile } from 'lucide-react';
+import ConfirmModal from './ConfirmModal';
 
 interface MemoItemProps {
   item: ContentItem;
@@ -15,6 +16,8 @@ const MemoItem: React.FC<MemoItemProps> = ({ item, isAdmin, onDelete }) => {
   const [name, setName] = useState('');
   const [content, setContent] = useState('');
   const [loadingComments, setLoadingComments] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [deleteCommentId, setDeleteCommentId] = useState<string | null>(null);
 
   // Subscribe to comments only when expanded to save resources
   useEffect(() => {
@@ -39,11 +42,16 @@ const MemoItem: React.FC<MemoItemProps> = ({ item, isAdmin, onDelete }) => {
     setContent('');
   };
 
-  const handleDeleteComment = async (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
-    if (window.confirm('댓글을 삭제하시겠습니까?')) {
-      await deleteComment(id);
+  const confirmDeleteComment = async () => {
+    if (deleteCommentId) {
+      await deleteComment(deleteCommentId, item.id);
+      setDeleteCommentId(null);
     }
+  };
+
+  const handleDeleteCommentClick = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    setDeleteCommentId(id);
   };
 
   const handleDeletePost = (e: React.MouseEvent) => {
@@ -51,8 +59,24 @@ const MemoItem: React.FC<MemoItemProps> = ({ item, isAdmin, onDelete }) => {
     onDelete(item.id);
   };
 
+  const handleSmileClick = () => {
+    setShowTooltip(true);
+    setTimeout(() => {
+      setShowTooltip(false);
+    }, 2000);
+  };
+
   return (
     <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden mb-3 transition-all">
+      <ConfirmModal 
+        isOpen={!!deleteCommentId}
+        title="댓글 삭제"
+        message="정말 이 댓글을 삭제하시겠습니까?"
+        onConfirm={confirmDeleteComment}
+        onCancel={() => setDeleteCommentId(null)}
+        confirmText="삭제"
+      />
+
       {/* Memo Content (Clickable Header) */}
       <div 
         onClick={() => setIsExpanded(!isExpanded)}
@@ -102,7 +126,7 @@ const MemoItem: React.FC<MemoItemProps> = ({ item, isAdmin, onDelete }) => {
                  <div key={comment.id} className="bg-white border border-gray-200 p-2 rounded text-xs relative group">
                     {isAdmin && (
                       <button 
-                        onClick={(e) => handleDeleteComment(e, comment.id)}
+                        onClick={(e) => handleDeleteCommentClick(e, comment.id)}
                         className="absolute top-1 right-1 text-gray-300 hover:text-red-500 clickable p-1"
                       >
                         <Trash2 size={12} />
@@ -132,11 +156,20 @@ const MemoItem: React.FC<MemoItemProps> = ({ item, isAdmin, onDelete }) => {
                 onChange={(e) => setName(e.target.value)}
                 required
               />
-              <div 
-                className="bg-orange-100 p-1.5 rounded-full text-cy-orange clickable cursor-pointer hover:bg-orange-200 transition-colors"
-                onClick={() => alert('실명으로 해주면 감사하겠어')}
-              >
-                <Smile size={16} />
+              <div className="relative">
+                <div 
+                  className="bg-orange-100 p-1.5 rounded-full text-cy-orange clickable cursor-pointer hover:bg-orange-200 transition-colors"
+                  onClick={handleSmileClick}
+                >
+                  <Smile size={16} />
+                </div>
+                {/* Speech Bubble Tooltip */}
+                {showTooltip && (
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[200px] bg-cy-dark text-white text-[10px] px-2 py-1 rounded shadow-lg animate-fade-in z-20 font-pixel">
+                    실명으로 해주면 감사하겠어
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-cy-dark"></div>
+                  </div>
+                )}
               </div>
             </div>
 
